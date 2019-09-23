@@ -1,2 +1,3 @@
 # dotfiles
-# dotfiles
+`$ bash dotfilesLink.sh`するのみ!!
+
