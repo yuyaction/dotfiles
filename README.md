@@ -1,3 +1,2 @@
 # dotfiles
-`$ bash dotfilesLink.sh`するのみ!!
-
+Just type `$ bash dotfilesLink.sh` !!

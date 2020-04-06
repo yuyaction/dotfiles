@@ -4,57 +4,65 @@ filetype off
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 Plugin 'VundleVim/Vundle.vim'
-" 導入したいプラグインを以下に列挙
-" Plugin '[Github Author]/[Github repo]' の形式
-"--- ()をカラフルにする ---
+
+" Plugin '[Github Author]/[Github repo]' 
+"--- make () colorful ---
 Plugin 'luochen1990/rainbow'
 let g:rainbow_active = 1
-
+Plugin 'Lokaltog/vim-powerline'      
+"---easy motion ---
+Plugin 'easymotion/vim-easymotion'
+let mapleader = "\<Space>"
 "--- SuperTab ---
 Plugin 'ervandew/supertab'
 let g:SuperTabContextDefaultCompletionType = "context"
 let g:SuperTabDefaultCompletionType = "<c-n>"
-
-"--- html補完(html,CSSのみ) ---
+"--- directory tree in vim ---
+Plugin 'scrooloose/nerdtree'
+nnoremap <silent><C-e> :NERDTreeToggle<CR>
+"--- html,css complete ---
 Plugin 'mattn/emmet-vim'   
 let g:user_emmet_install_global = 0
 autocmd FileType html,css EmmetInstall
-
+"--- latex complete ---
 Plugin 'lervag/vimtex'
 Plugin 'Shougo/neocomplete.vim'
-Plugin 'scrooloose/nerdtree'
-"c,c++ 補完
+"--- c,c++ complete
 Plugin 'justmao945/vim-clang'
-"テンプレート
+"--- templates ---
 Plugin 'mattn/sonictemplate-vim'
-Plugin 'Lokaltog/vim-powerline'
-"Plugin 'davidhalter/jedi-vim'
-"Plugin 'aperezdc/vim-template'
-call vundle#end()
+Plugin 'davidhalter/jedi-vim'
+"--- git in vim ---
+Plugin 'airblade/vim-gitgutter'
+Plugin 'tpope/vim-fugitive'
+"--- snipetts ---
+Plugin 'Shougo/neosnippet.vim'
+Plugin 'Shougo/neosnippet-snippets'
+let g:neosnippet#disable_runtime_snippets = { 'tex' : 1 }
+let s:my_snippet='~/.vim/snippets/'
+let g:neosnippet#snippets_directory = s:my_snippet
+
 filetype plugin indent on
 "### VndleVim end ###
 
 "### key-mapping ###
-"ディレクトリツリー
-nnoremap <silent><C-e> :NERDTreeToggle<CR>
+"enable backspace in insert mode
+set backspace=indent,eol,start
 inoremap <silent> jj <ESC>
 inoremap <silent> っj <ESC>
 inoremap <C-s> <Esc>:w<CR>
 inoremap jj <Esc> :w<CR>
 noremap <S-h> ^
 noremap <S-l> $
-"ノーマルモードでCR,Space,BS
+"CR,BS in normal mode
 noremap <CR> i<CR><ESC> 
-noremap <Space> i<Space><ESC>
 noremap <BS> i<BS><ESC>
-
 inoremap { {}<LEFT>
 inoremap ( ()<LEFT>
 inoremap [ []<LEFT>
 inoremap ' ''<LEFT>
 inoremap " ""<LEFT>
-inoremap $ $$<LEFT>
-"htmlだけ
+"only html
 if expand("%:e")=="html"
   inoremap < <><LEFT>
 endif
@@ -76,23 +84,6 @@ nnoremap う u
 nnoremap お o
 nnoremap っd dd
 nnoremap っy yy
-" vimに矢印キーはいらない
-inoremap <Up> <Nop>
-inoremap <Down> <Nop>
-inoremap <Left> <Nop>
-inoremap <Right> <Nop>
-nnoremap <Up> <Nop>
-nnoremap <Down> <Nop>
-nnoremap <Left> <Nop>
-nnoremap <Right> <Nop>
-cnoremap <Up> <Nop>
-cnoremap <Down> <Nop>
-cnoremap <Left> <Nop>
-cnoremap <Right> <Nop>
-vnoremap <Up> <Nop>
-vnoremap <Down> <Nop>
-vnoremap <Left> <Nop>
-vnoremap <Right> <Nop>
 " カーソル移動のキーマップ
 nnoremap j gj
 nnoremap gj j
@@ -106,6 +97,7 @@ nnoremap $ g$
 nnoremap g$ $
 inoremap <C-h> <Left>
 inoremap <C-l> <Right>
+
 "### key-mapping end ###
 
 "### setting ###
@@ -203,6 +195,11 @@ autocmd FileType python setl smartindent cinwords=if,elif,else,for,while,try,exc
 autocmd FileType python setl tabstop=8 expandtab shiftwidth=4 softtabstop=4
 "docstring window開かないようにする
 autocmd FileType python setlocal completeopt-=preview
+
+"---fortran ---
+let fortran_free_source=1
+let fortran_fold=1
+au! BufRead,BufNewFile *.f90 let b:fortran_do_enddo=1
 
 
 "vim内でF5でRunする(C,C++,Python,fortran対応)
