@@ -1,60 +1,72 @@
+set backspace=indent,eol,start
 "### VundleVim ###
 set nocompatible
 filetype off
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 Plugin 'VundleVim/Vundle.vim'
-
-" Plugin '[Github Author]/[Github repo]' 
-"--- make () colorful ---
+" 導入したいプラグインを以下に列挙
+" Plugin '[Github Author]/[Github repo]' の形式
+"--- ()をカラフルにする ---
 Plugin 'luochen1990/rainbow'
 let g:rainbow_active = 1
-Plugin 'Lokaltog/vim-powerline'      
-"---easy motion ---
+"---移動
 Plugin 'easymotion/vim-easymotion'
-let mapleader = "\<Space>"
 "--- SuperTab ---
 Plugin 'ervandew/supertab'
 let g:SuperTabContextDefaultCompletionType = "context"
 let g:SuperTabDefaultCompletionType = "<c-n>"
-"--- directory tree in vim ---
-Plugin 'scrooloose/nerdtree'
-nnoremap <silent><C-e> :NERDTreeToggle<CR>
-"--- html,css complete ---
+
+"--- html補完(html,CSSのみ) ---
 Plugin 'mattn/emmet-vim'   
 let g:user_emmet_install_global = 0
 autocmd FileType html,css EmmetInstall
-"--- latex complete ---
+
 Plugin 'lervag/vimtex'
 Plugin 'Shougo/neocomplete.vim'
-"--- c,c++ complete
+Plugin 'scrooloose/nerdtree'
+"c,c++ 補完
 Plugin 'justmao945/vim-clang'
-"--- templates ---
+"テンプレート
 Plugin 'mattn/sonictemplate-vim'
-Plugin 'davidhalter/jedi-vim'
-"--- git in vim ---
-Plugin 'airblade/vim-gitgutter'
-Plugin 'tpope/vim-fugitive'
-"--- snipetts ---
+Plugin 'Lokaltog/vim-powerline'      
 Plugin 'Shougo/neosnippet.vim'
 Plugin 'Shougo/neosnippet-snippets'
+Plugin 'davidhalter/jedi-vim'
+"Plugin 'aperezdc/vim-template'
+"vimでgit
+Plugin 'airblade/vim-gitgutter'
+Plugin 'tpope/vim-fugitive'
+"###
 let g:neosnippet#disable_runtime_snippets = { 'tex' : 1 }
 let s:my_snippet='~/.vim/snippets/'
 let g:neosnippet#snippets_directory = s:my_snippet
+""""
+"for easymotion
+let mapleader = "\<Space>"
+"map <leader> <Plug>(easymotion-prefix)
+"Bootstrap 
+"Plugin 'jvanja/vim-bootstrap4-snippets'
+"snippets
+""Plugin 'SirVer/ultisnips'
+""Plugin 'honza/vim-snippets'
+""let g:UltiSnipsExpandTrigger="<tab>"
+""let g:UltiSnipsEditSplit="vertical"
 
+call vundle#end()
 filetype plugin indent on
 "### VndleVim end ###
 
 "### key-mapping ###
-"enable backspace in insert mode
-set backspace=indent,eol,start
+"ディレクトリツリー
+nnoremap <silent><C-e> :NERDTreeToggle<CR>
 inoremap <silent> jj <ESC>
 inoremap <silent> っj <ESC>
 inoremap <C-s> <Esc>:w<CR>
 inoremap jj <Esc> :w<CR>
 noremap <S-h> ^
 noremap <S-l> $
-"CR,BS in normal mode
+"ノーマルモードでCR,Space,BS
 noremap <CR> i<CR><ESC> 
 noremap <BS> i<BS><ESC>
 inoremap { {}<LEFT>
@@ -62,7 +74,7 @@ inoremap ( ()<LEFT>
 inoremap [ []<LEFT>
 inoremap ' ''<LEFT>
 inoremap " ""<LEFT>
-"only html
+"htmlだけ
 if expand("%:e")=="html"
   inoremap < <><LEFT>
 endif
@@ -113,6 +125,19 @@ set autoread
 set hidden
 "入力中のコマンドをステータスに表示する
 set showcmd
+"copy from c;ipboard
+if &term =~ "xterm"
+    let &t_SI .= "\e[?2004h"
+    let &t_EI .= "\e[?2004l"
+    let &pastetoggle = "\e[201~"
+
+    function XTermPasteBegin(ret)
+        set paste
+        return a:ret
+    endfunction
+
+    inoremap <special> <expr> <Esc>[200~ XTermPasteBegin("")
+endif
 "### setting end ###
 
 "### view ###
@@ -142,11 +167,11 @@ colorscheme molokai
 set t_Co=256
 
 " 不可視文字を可視化(タブが「▸-」と表示される)
-set list listchars=tab:\▸\-
+""set list listchars=tab:\▸\-
 " Tab文字を半角スペースにする
 set expandtab
 " 行頭以外のTab文字の表示幅（スペースいくつ分）
-set tabstop=2
+set tabstop=3
 " 行頭でのTab文字の表示幅
 set shiftwidth=2
 "### view end ###
@@ -245,3 +270,48 @@ function! s:Gfortran()
     :!./%:r.out
 endfunction
 "### Languages end ###
+
+" Anywhere SID.
+function! s:SID_PREFIX()
+  return matchstr(expand('<sfile>'), '<SNR>\d\+_\zeSID_PREFIX$')
+endfunction
+
+" Set tabline.
+function! s:my_tabline()  "{{{
+  let s = ''
+  for i in range(1, tabpagenr('$'))
+    let bufnrs = tabpagebuflist(i)
+    let bufnr = bufnrs[tabpagewinnr(i) - 1]  " first window, first appears
+    let no = i  " display 0-origin tabpagenr.
+    let mod = getbufvar(bufnr, '&modified') ? '!' : ' '
+    let title = fnamemodify(bufname(bufnr), ':t')
+    let title = '[' . title . ']'
+    let s .= '%'.i.'T'
+    let s .= '%#' . (i == tabpagenr() ? 'TabLineSel' : 'TabLine') . '#'
+    let s .= no . ':' . title
+    let s .= mod
+    let s .= '%#TabLineFill# '
+  endfor
+  let s .= '%#TabLineFill#%T%=%#TabLine#'
+  return s
+endfunction "}}}
+let &tabline = '%!'. s:SID_PREFIX() . 'my_tabline()'
+set showtabline=2 " 常にタブラインを表示
+
+" The prefix key.
+nnoremap    [Tag]   <Nop>
+nmap    t [Tag]
+" Tab jump
+for n in range(1, 9)
+  execute 'nnoremap <silent> [Tag]'.n  ':<C-u>tabnext'.n.'<CR>'
+endfor
+" t1 で1番左のタブ、t2 で1番左から2番目のタブにジャンプ
+
+map <silent> [Tag]c :tablast <bar> tabnew<CR>
+" tc 新しいタブを一番右に作る
+map <silent> [Tag]x :tabclose<CR>
+" tx タブを閉じる
+map <silent> [Tag]n :tabnext<CR>
+" tn 次のタブ
+map <silent> [Tag]p :tabprevious<CR>
+" tp 前のタブ
